@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shoppy/providers/products_provider.dart';
 
 import 'helpers/routes.dart' as route_provider;
 
 void main() {
-  runApp(const ShoppyApp());
+  runApp(
+    ChangeNotifierProvider(
+        create: (context) => ProductsProvider(), child: const ShoppyApp()),
+  );
 }
 
 class ShoppyApp extends StatelessWidget {
@@ -14,9 +19,11 @@ class ShoppyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.teal,
-        // secondaryColor: Colors.blue
-      ),
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.teal)
+              .copyWith(secondary: Colors.purple),
+          fontFamily: 'Lato'
+          // secondaryColor: Colors.blue
+          ),
       title: 'Shoppy',
       routes: route_provider.routes,
       initialRoute: route_provider.productOverviewScreen,

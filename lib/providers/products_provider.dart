@@ -39,6 +39,10 @@ class ProductsProvider with ChangeNotifier {
   ];
 
   List<Product> get allProduct {
-    return loadedList;
+    return [...loadedList];
+  }
+
+  int get productNumber {
+    return loadedList.length;
   }
 }
