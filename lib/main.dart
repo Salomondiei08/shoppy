@@ -7,7 +7,9 @@ import 'helpers/routes.dart' as route_provider;
 void main() {
   runApp(
     ChangeNotifierProvider(
-        create: (context) => ProductsProvider(), child: const ShoppyApp()),
+      create: (context) => ProductsProvider(),
+      child: const ShoppyApp(),
+    ),
   );
 }
 

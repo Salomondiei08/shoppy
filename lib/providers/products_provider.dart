@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shoppy/models/product.dart';
 
 class ProductsProvider with ChangeNotifier {
-  List<Product> loadedList = [
+  final List<Product> _loadedList = [
     Product(
       id: 'p1',
       title: 'Red Shirt',
@@ -39,10 +39,33 @@ class ProductsProvider with ChangeNotifier {
   ];
 
   List<Product> get allProduct {
-    return [...loadedList];
+    return [..._loadedList];
+  }
+
+  List<Product> get favoriteProduct {
+    return _loadedList.where((element) => element.isFavorite).toList();
+  }
+
+  int get productFavoriteNumber {
+    return favoriteProduct.length;
   }
 
   int get productNumber {
-    return loadedList.length;
+    return allProduct.length;
+  }
+
+  Product findProductById(String id) {
+    return _loadedList.firstWhere((element) => element.id == id);
+  }
+
+  void setFavorite(String id) {
+    Product product = _loadedList.firstWhere((element) => element.id == id);
+    if (product.isFavorite == false) {
+      product.isFavorite = true;
+      notifyListeners();
+    } else {
+      product.isFavorite = false;
+      notifyListeners();
+    }
   }
 }
