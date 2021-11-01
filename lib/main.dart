@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shoppy/providers/cart.dart';
 import 'package:shoppy/providers/products_provider.dart';
 
-import 'helpers/routes.dart' as route_provider;
+import 'helpers/routes.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ProductsProvider(),
-      child: const ShoppyApp(),
-    ),
-  );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => ProductsProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => Cart(),
+      )
+    ],
+    child: const ShoppyApp(),
+  ));
 }
 
 class ShoppyApp extends StatelessWidget {
@@ -27,8 +33,8 @@ class ShoppyApp extends StatelessWidget {
           // secondaryColor: Colors.blue
           ),
       title: 'Shoppy',
-      routes: route_provider.routes,
-      initialRoute: route_provider.productOverviewScreen,
+      routes: Routes.routesList,
+      initialRoute: Routes.productOverviewScreen,
     );
   }
 }

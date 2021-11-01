@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shoppy/helpers/routes.dart';
+import 'package:shoppy/providers/cart.dart';
 import 'package:shoppy/providers/products_provider.dart';
+import 'package:shoppy/widgets/badge.dart';
 import 'package:shoppy/widgets/product_item.dart';
 
 enum FilterOptions { all, onlyFavorites }
@@ -13,26 +16,35 @@ class ProductOverviewScreen extends StatefulWidget {
 }
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
-
-   bool _showFavorite = false;
+  bool _showFavorite = false;
   @override
   Widget build(BuildContext context) {
-   
-
     void _setFilterOptions(FilterOptions filterOption) {
-      setState(() {
-        if (filterOption == FilterOptions.all) {
-          _showFavorite = false;
-        } else {
-          _showFavorite = true;
-        }
-      });
+      setState(
+        () {
+          if (filterOption == FilterOptions.all) {
+            _showFavorite = false;
+          } else {
+            _showFavorite = true;
+          }
+        },
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shoppy'),
         actions: [
+          Consumer<Cart>(
+            builder: (_, cart, child) => Badge(
+              child: child!,
+              value: cart.itemCount.toString(),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.shopping_cart),
+              onPressed: () => Navigator.pushNamed(context, Routes.cartScreen),
+            ),
+          ),
           PopupMenuButton(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -58,15 +70,6 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
             child: GridView.builder(
               itemBuilder: (context, index) {
                 return ProductGrid(
-                  title: _showFavorite
-                      ? product.favoriteProduct[index].title
-                      : product.allProduct[index].title,
-                  imageUrl: _showFavorite
-                      ? product.favoriteProduct[index].imageUrl
-                      : product.allProduct[index].imageUrl,
-                  isFavorite: _showFavorite
-                      ? product.favoriteProduct[index].isFavorite
-                      : product.allProduct[index].isFavorite,
                   id: _showFavorite
                       ? product.favoriteProduct[index].id
                       : product.allProduct[index].id,
@@ -87,5 +90,3 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
     );
   }
 }
-
-class ProductProvider {}
