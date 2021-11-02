@@ -4,6 +4,7 @@ import 'package:shoppy/providers/cart.dart';
 import 'package:shoppy/providers/products_provider.dart';
 
 import 'helpers/routes.dart';
+import 'providers/orders.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -13,6 +14,9 @@ void main() {
       ),
       ChangeNotifierProvider(
         create: (context) => Cart(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => Orders(),
       )
     ],
     child: const ShoppyApp(),

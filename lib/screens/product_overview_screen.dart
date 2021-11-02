@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shoppy/helpers/routes.dart';
 import 'package:shoppy/providers/cart.dart';
 import 'package:shoppy/providers/products_provider.dart';
+import 'package:shoppy/widgets/app_drawer.dart';
 import 'package:shoppy/widgets/badge.dart';
 import 'package:shoppy/widgets/product_item.dart';
 
@@ -32,6 +33,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
     }
 
     return Scaffold(
+            drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Shoppy'),
         actions: [

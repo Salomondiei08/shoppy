@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:shoppy/models/cart_item.dart';
 
+
 class Cart with ChangeNotifier {
-  final Map<String, CartItem> _items = {};
+   Map<String, CartItem> _items = {};
+
 
   Map<String, CartItem> get allCart {
     return {..._items};
@@ -48,4 +50,10 @@ class Cart with ChangeNotifier {
     _items.remove(productId);
     notifyListeners();
   }
+
+  void clearCart() {
+    _items = {};
+    notifyListeners();
+  }
+
 }
