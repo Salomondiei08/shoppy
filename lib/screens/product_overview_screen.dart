@@ -7,6 +7,7 @@ import 'package:shoppy/widgets/app_drawer.dart';
 import 'package:shoppy/widgets/badge.dart';
 import 'package:shoppy/widgets/product_item.dart';
 
+
 enum FilterOptions { all, onlyFavorites }
 
 class ProductOverviewScreen extends StatefulWidget {
@@ -20,6 +21,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   bool _showFavorite = false;
   @override
   Widget build(BuildContext context) {
+    
     void _setFilterOptions(FilterOptions filterOption) {
       setState(
         () {

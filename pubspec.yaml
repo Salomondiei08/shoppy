@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   provider: ^6.0.1
   intl: ^0.17.0
+  cached_network_image: ^3.2.0
+  gaimon: ^1.0.0+2
+  add_to_cart_animation: ^1.0.1
 
 dev_dependencies:
   flutter_test:

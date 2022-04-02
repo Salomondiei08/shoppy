@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:shoppy/models/product.dart';
 
+
 class ProductsProvider with ChangeNotifier {
+
   final List<Product> _loadedList = [
     Product(
       id: 'p1',
