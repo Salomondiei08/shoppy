@@ -21,7 +21,6 @@ class CartTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      
       key: ValueKey(id),
       onDismissed: (direction) =>
           Provider.of<Cart>(context, listen: false).deleteItem(productId),
@@ -33,7 +32,23 @@ class CartTile extends StatelessWidget {
         child: const Icon(Icons.delete, color: Colors.white),
         color: Theme.of(context).errorColor,
       ),
-      
+      confirmDismiss: (direction) => showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Are you sure'),
+          content: const Text('DO you want to delete thid item ?'),
+          actions: [
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+            TextButton(
+              child: const Text('No'),
+              onPressed: () => Navigator.of(context).pop(false),
+            )
+          ],
+        ),
+      ),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 15),
         child: ListTile(

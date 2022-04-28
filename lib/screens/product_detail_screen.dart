@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shoppy/providers/products_provider.dart';
 import 'package:shoppy/widgets/app_drawer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   const ProductDetailScreen({Key? key}) : super(key: key);
@@ -15,7 +16,6 @@ class ProductDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(products.findProductById(productId).title),
       ),
-
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -23,7 +23,8 @@ class ProductDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               height: 300,
               width: double.infinity,
-              child: Image.network(products.findProductById(productId).imageUrl,
+              child: CachedNetworkImage(
+                  imageUrl: products.findProductById(productId).imageUrl,
                   fit: BoxFit.cover),
             ),
             const SizedBox(

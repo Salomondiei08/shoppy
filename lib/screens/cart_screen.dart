@@ -7,7 +7,6 @@ import 'package:shoppy/widgets/cart_tile.dart';
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<Cart>(context);
@@ -41,48 +40,34 @@ class CartScreen extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
+                      if (cart.itemCount < 1) return;
                       showDialog(
                         context: context,
-                        builder: (ctx) => SimpleDialog(
+                        builder: (ctx) => AlertDialog(
                           title: const Text('Order Notice'),
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.all(20.0),
-                              child: Text(
-                                'Do you want to Order ?',
+                          content: Text(
+                            'Do you want to Order ?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text(
+                                'No',
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(30.0),
-                              child: Row(
-                                children: [
-                                  TextButton(
-                                    onPressed: () {},
-                                    child: const Text(
-                                      'No',
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 20,
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Provider.of<Orders>(context, listen: false)
-                                          .addOrder(cart.allCart.values.toList(),
-                                              cart.totalAmount);
-                                      cart.clearCart();
-                                    },
-                                    child: const Text(
-                                      'Yes',
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                ],
+                            TextButton(
+                              onPressed: () {
+                                Provider.of<Orders>(context, listen: false)
+                                    .addOrder(cart.allCart.values.toList(),
+                                        cart.totalAmount);
+                                cart.clearCart();
+
+                                Navigator.pop(context);
+                              },
+                              child: const Text(
+                                'Yes',
+                                style: TextStyle(fontSize: 18),
                               ),
                             )
                           ],

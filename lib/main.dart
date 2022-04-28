@@ -37,8 +37,7 @@ class ShoppyApp extends StatelessWidget {
           // secondaryColor: Colors.blue
           ),
       title: 'Shoppy',
-      routes: Routes.routesList,
-      initialRoute: Routes.productOverviewScreen,
+      onGenerateRoute: Routes.onGenerateGoute,
     );
   }
 }
