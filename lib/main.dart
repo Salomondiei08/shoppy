@@ -24,7 +24,7 @@ void main() {
 }
 
 class ShoppyApp extends StatelessWidget {
-  const ShoppyApp({Key? key}) : super(key: key);
+  const ShoppyApp({Key? key}) : super(key: key); 
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,9 @@ class ShoppyApp extends StatelessWidget {
           // secondaryColor: Colors.blue
           ),
       title: 'Shoppy',
-      onGenerateRoute: Routes.onGenerateGoute,
+      initialRoute: Routes.productOverviewScreen,
+      routes: Routes.routesList,
+     // onGenerateRoute: Routes.onGenerateGoute,
     );
   }
 }
