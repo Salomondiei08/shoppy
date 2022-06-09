@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shoppy/providers/cart.dart';
 import 'package:shoppy/providers/products_provider.dart';
-
 import 'helpers/routes.dart';
 import 'providers/orders.dart';
 

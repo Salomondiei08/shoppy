@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shoppy/providers/products_provider.dart';
 
+import '../helpers/routes.dart';
 import '../widgets/user_product_item.dart';
 
 class UserProductsScreen extends StatelessWidget {
@@ -13,12 +14,20 @@ class UserProductsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Products'),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.add))],
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, Routes.editProductScreen);
+            },
+            icon: const Icon(Icons.add),
+          )
+        ],
       ),
       body: ListView.separated(
         separatorBuilder: (_, i) => const Divider(),
         itemCount: products.length,
         itemBuilder: (ctx, i) => UserProductItem(
+          id: products[i].id,
           title: products[i].title,
           imageUrl: products[i].imageUrl,
         ),

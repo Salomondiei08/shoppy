@@ -21,7 +21,7 @@ abstract class Routes {
     cartScreen: (context) => const CartScreen(),
     userProductsScreen: (context) => const UserProductsScreen(),
     orderScreen: (context) => const OrderScreen(),
-    editProductScreen: (context) => const EditProductScreen(),
+    editProductScreen: (context) => EditProductScreen(),
   };
 
   static Route onGenerateGoute(RouteSettings routeSettings) {

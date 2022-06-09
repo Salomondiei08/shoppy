@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shoppy/models/product.dart';
-
+import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
-
   final List<Product> _loadedList = [
     Product(
       id: 'p1',
@@ -68,5 +69,46 @@ class ProductsProvider with ChangeNotifier {
       product.isFavorite = false;
       notifyListeners();
     }
+  }
+
+  Future<void> addProduct(Product product) {
+    final url = Uri.parse(
+        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products.json");
+    return http.post(url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price
+        }))
+      .then((response) {
+        final id = json.decode(response.body)['name'];
+        final newProduct = Product(
+          id: id,
+          title: product.title,
+          description: product.description,
+          imageUrl: product.imageUrl,
+          price: product.price,
+        );
+        _loadedList.add(newProduct);
+        notifyListeners();
+      })
+      .catchError((error) {
+        print(error);
+        throw (error);
+      });
+  }
+
+  void updateProduct(Product newProduct, String id) {
+    final productIndex = _loadedList.indexWhere((element) => element.id == id);
+    if (productIndex >= 0) {
+      _loadedList[productIndex] = newProduct;
+      notifyListeners();
+    }
+  }
+
+  void deleteProduct(String id) {
+    _loadedList.removeWhere((element) => element.id == id);
+    notifyListeners();
   }
 }
