@@ -74,24 +74,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
     super.dispose();
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     final _isValid = _formKey.currentState!.validate();
 
     if (_isValid) {
       setState(() {
         _isLoading = true;
       });
+
       _formKey.currentState!.save();
+
       if (_editedProduct.id == '') {
-        Provider.of<ProductsProvider>(context, listen: false)
-            .addProduct(_editedProduct)
-            .then((_) {
-          setState(() {
-            _isLoading = false;
-          });
-          Navigator.pop(context);
-        }).catchError((error) {
-          showDialog(
+        try {
+          await Provider.of<ProductsProvider>(context, listen: false)
+              .addProduct(_editedProduct);
+        } catch (error) {
+         await showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
               content: const Text("Something went wrong"),
@@ -103,16 +101,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ],
             ),
           );
-          Navigator.pop(context);
-        });
+        }
       } else {
-        Provider.of<ProductsProvider>(context, listen: false)
+        await Provider.of<ProductsProvider>(context, listen: false)
             .updateProduct(_editedProduct, _editedProduct.id);
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.pop(context);
       }
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.pop(context);
     }
   }
 

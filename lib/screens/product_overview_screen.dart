@@ -7,7 +7,6 @@ import 'package:shoppy/widgets/app_drawer.dart';
 import 'package:shoppy/widgets/badge.dart';
 import 'package:shoppy/widgets/product_item.dart';
 
-
 enum FilterOptions { all, onlyFavorites }
 
 class ProductOverviewScreen extends StatefulWidget {
@@ -18,10 +17,28 @@ class ProductOverviewScreen extends StatefulWidget {
 }
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
+
   bool _showFavorite = false;
+  bool _isDataLoading = false;
+
+  Future<void> getOlineData() async {
+    setState(() {
+      _isDataLoading = true;
+    });
+await  Provider.of<ProductsProvider>(context, listen: false).fetchAndSetProducts();
+    setState(() {
+      _isDataLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    getOlineData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    
     void _setFilterOptions(FilterOptions filterOption) {
       setState(
         () {
@@ -35,7 +52,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
     }
 
     return Scaffold(
-            drawer: const AppDrawer(),
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Shoppy'),
         actions: [
@@ -67,30 +84,38 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
           )
         ],
       ),
-      body: Consumer<ProductsProvider>(
-        builder: (context, product, child) {
-          return Padding(
-            padding: const EdgeInsets.all(10),
-            child: GridView.builder(
-              itemBuilder: (context, index) {
-                return ProductGrid(
-                  id: _showFavorite
-                      ? product.favoriteProduct[index].id
-                      : product.allProduct[index].id,
-                );
-              },
-              itemCount: _showFavorite
-                  ? product.productFavoriteNumber
-                  : product.productNumber,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+      body: _isDataLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : RefreshIndicator(
+            onRefresh: getOlineData,
+            child: Consumer<ProductsProvider>(
+                builder: (context, product, child) {
+                  return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: GridView.builder(
+                      itemBuilder: (context, index) {
+                        return ProductGrid(
+                          id: _showFavorite
+                              ? product.favoriteProduct[index].id
+                              : product.allProduct[index].id,
+                        );
+                      },
+                      itemCount: _showFavorite
+                          ? product.productFavoriteNumber
+                          : product.productNumber,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                      ),
+                    ),
+                  );
+                },
               ),
-            ),
-          );
-        },
-      ),
+          ),
     );
   }
 }

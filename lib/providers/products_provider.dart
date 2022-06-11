@@ -1,44 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:shoppy/exceptions/http_exceptions.dart';
 import 'package:shoppy/models/product.dart';
 import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
-  final List<Product> _loadedList = [
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl:
-          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-    ),
-    Product(
-      id: 'p4',
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
-  ];
+  List<Product> _loadedList = [];
 
   List<Product> get allProduct {
     return [..._loadedList];
@@ -60,55 +28,124 @@ class ProductsProvider with ChangeNotifier {
     return _loadedList.firstWhere((element) => element.id == id);
   }
 
-  void setFavorite(String id) {
+  Future<void> setFavorite(String id) async {
+    final url = Uri.parse(
+        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json");
+
     Product product = _loadedList.firstWhere((element) => element.id == id);
-    if (product.isFavorite == false) {
-      product.isFavorite = true;
-      notifyListeners();
-    } else {
-      product.isFavorite = false;
+    final favoriteStatus = product.isFavorite;
+    product.isFavorite = !product.isFavorite;
+    notifyListeners();
+    try {
+      final response = await http.patch(url,
+          body: json.encode({'isFavorite': product.isFavorite}));
+
+      if (response.statusCode >= 400) {
+        product.isFavorite = favoriteStatus;
+        notifyListeners();
+      }
+    } catch (error) {
+      product.isFavorite = favoriteStatus;
       notifyListeners();
     }
   }
 
-  Future<void> addProduct(Product product) {
-    final url = Uri.parse(
-        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products.json");
-    return http.post(url,
-        body: json.encode({
-          'title': product.title,
-          'description': product.description,
-          'imageUrl': product.imageUrl,
-          'price': product.price
-        }))
-      .then((response) {
-        final id = json.decode(response.body)['name'];
-        final newProduct = Product(
-          id: id,
-          title: product.title,
-          description: product.description,
-          imageUrl: product.imageUrl,
-          price: product.price,
+  Future<void> fetchAndSetProducts() async {
+    try {
+      final url = Uri.parse(
+          "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products.json");
+
+      final response = await http.get(url);
+      final dynamic extractedData = json.decode(response.body) as Map<String, dynamic>;
+       if(extractedData == null){
+        return;
+      }
+      final List<Product> loadedProducts = [];
+      extractedData.forEach((prodId, prodData) {
+        loadedProducts.add(
+          Product(
+            id: prodId,
+            title: prodData['title'],
+            description: prodData['description'],
+            price: prodData['price'],
+            imageUrl: prodData['imageUrl'],
+            isFavorite: prodData['isFavorite'],
+          ),
         );
-        _loadedList.add(newProduct);
-        notifyListeners();
-      })
-      .catchError((error) {
-        print(error);
-        throw (error);
       });
+      _loadedList = loadedProducts;
+      notifyListeners();
+    } catch (error) {
+      print('Une erreue est survenue : $error');
+      rethrow;
+    }
   }
 
-  void updateProduct(Product newProduct, String id) {
+  Future<void> addProduct(Product product) async {
+    final url = Uri.parse(
+        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products.json");
+
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            'title': product.title,
+            'description': product.description,
+            'imageUrl': product.imageUrl,
+            'price': product.price,
+          }));
+
+      final id = json.decode(response.body)['name'];
+      final newProduct = Product(
+        id: id,
+        title: product.title,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        price: product.price,
+      );
+      _loadedList.add(newProduct);
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      rethrow;
+    }
+  }
+
+  Future<void> updateProduct(Product newProduct, String id) async {
+    final url = Uri.parse(
+        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json");
+
     final productIndex = _loadedList.indexWhere((element) => element.id == id);
     if (productIndex >= 0) {
+      await http.patch(url,
+          body: json.encode({
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'price': newProduct.price,
+            'isFavorite': newProduct.isFavorite
+          }));
       _loadedList[productIndex] = newProduct;
       notifyListeners();
     }
   }
 
-  void deleteProduct(String id) {
+  Future<void> deleteProduct(String id) async {
+    final url = Uri.parse(
+        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json");
+
+    final existingProductId =
+        _loadedList.indexWhere((element) => element.id == id);
+
+    var exisingElement = _loadedList.elementAt(existingProductId);
+
     _loadedList.removeWhere((element) => element.id == id);
     notifyListeners();
+
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      _loadedList.insert(existingProductId, exisingElement);
+      notifyListeners();
+      throw HttpException(message: 'Could not delete the product');
+    }
   }
 }

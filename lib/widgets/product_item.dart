@@ -6,14 +6,12 @@ import 'package:shoppy/providers/products_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:gaimon/gaimon.dart';
 
-
 class ProductGrid extends StatelessWidget {
   const ProductGrid({Key? key, required this.id}) : super(key: key);
   final String id;
 
   @override
   Widget build(BuildContext context) {
-    
     final product = Provider.of<ProductsProvider>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
 
@@ -35,8 +33,14 @@ class ProductGrid extends StatelessWidget {
           ),
           backgroundColor: Colors.black54,
           leading: IconButton(
-            onPressed: () {
-              product.setFavorite(id);
+            onPressed: () async {
+              try {
+                await product.setFavorite(id);
+              } catch (e) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Can't set favorite")));
+              }
             },
             icon: Icon(
                 product.findProductById(id).isFavorite
@@ -58,7 +62,7 @@ class ProductGrid extends StatelessWidget {
                       label: 'Undo',
                       onPressed: () {
                         cart.removeSingleItem(id);
-                         Gaimon.selection();
+                        Gaimon.selection();
                       }),
                 ),
               );
