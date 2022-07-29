@@ -22,7 +22,7 @@ class ProductGrid extends StatelessWidget {
           onTap: () => Navigator.pushNamed(context, Routes.productDetailScreen,
               arguments: id),
           child: CachedNetworkImage(
-              placeholder: ((context, url) => const Text('Image Looading')),
+              placeholder: ((context, url) => const Center(child:  Text('Image Looading'))),
               imageUrl: product.findProductById(id).imageUrl,
               fit: BoxFit.cover),
         ),

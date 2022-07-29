@@ -5,16 +5,20 @@ import 'package:shoppy/models/cart_item.dart';
 import 'package:shoppy/models/order_item.dart';
 import 'package:http/http.dart' as http;
 
+import '../helpers/constants.dart';
+
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
 
+  final String? authToken;
+  final String? userId;
+  Orders(this.authToken, this._orders, this.userId);
   List<OrderItem> get orders {
     return [..._orders];
   }
 
   Future<void> addOrders(List<CartItem> cartOrderItems, double amount) async {
-    final url = Uri.parse(
-        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/orders.json");
+    final url = Uri.parse(apiBaseUrl + "orders/$userId.json?auth=$authToken");
 
     final date = DateTime.now();
 
@@ -52,8 +56,7 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> fetchAndSetOrderItems() async {
-    final url = Uri.parse(
-        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/orders.json");
+    final url = Uri.parse(apiBaseUrl + "orders/$userId.json?auth=$authToken");
     try {
       final response = await http.get(url);
       final dynamic extractedData =
@@ -82,7 +85,6 @@ class Orders with ChangeNotifier {
       notifyListeners();
     } catch (error) {
       print('Une erreue est survenue : $error');
-     
     }
   }
 }

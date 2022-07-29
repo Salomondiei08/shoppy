@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shoppy/helpers/routes.dart';
+
+import '../providers/auth.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -14,25 +17,34 @@ class AppDrawer extends StatelessWidget {
             automaticallyImplyLeading: false,
           ),
           const Divider(),
-           ListTile(
+          ListTile(
             leading: const Icon(Icons.shop),
             title: const Text('Shop'),
-            onTap: () => Navigator.pushReplacementNamed(context, Routes.productOverviewScreen),
-
+            onTap: () => Navigator.pushReplacementNamed(
+                context, Routes.productOverviewScreen),
           ),
           const Divider(),
-           ListTile(
+          ListTile(
             leading: const Icon(Icons.shopping_cart),
             title: const Text('Orders'),
             onTap: () => Navigator.pushNamed(context, Routes.orderScreen),
           ),
-
-             const Divider(),
-           ListTile(
+          const Divider(),
+          ListTile(
             leading: const Icon(Icons.edit),
             title: const Text('Products'),
-            onTap: () => Navigator.pushNamed(context, Routes.userProductsScreen),
+            onTap: () =>
+                Navigator.pushNamed(context, Routes.userProductsScreen),
           ),
+          const Divider(),
+          ListTile(
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text('Log Out'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/');
+                Provider.of<Auth>(context, listen: false).logout();
+              }),
         ],
       ),
     );

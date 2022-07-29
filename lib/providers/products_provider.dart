@@ -5,10 +5,21 @@ import 'package:shoppy/exceptions/http_exceptions.dart';
 import 'package:shoppy/models/product.dart';
 import 'package:http/http.dart' as http;
 
+import '../helpers/constants.dart';
+
 class ProductsProvider with ChangeNotifier {
+  final String? authToken;
+  final String? userId;
+
+  ProductsProvider(
+    this.authToken,
+    this._loadedList,
+    this.userId,
+  );
+
   List<Product> _loadedList = [];
 
-  List<Product> get allProduct {
+  List<Product> get allProducts {
     return [..._loadedList];
   }
 
@@ -21,7 +32,7 @@ class ProductsProvider with ChangeNotifier {
   }
 
   int get productNumber {
-    return allProduct.length;
+    return allProducts.length;
   }
 
   Product findProductById(String id) {
@@ -29,8 +40,7 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> setFavorite(String id) async {
-    final url = Uri.parse(
-        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json");
+    final url = Uri.parse(apiBaseUrl + "products/$id.json?auth=$authToken");
 
     Product product = _loadedList.firstWhere((element) => element.id == id);
     final favoriteStatus = product.isFavorite;
@@ -50,29 +60,38 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts({bool filterProducts = false}) async {
+
+    String filterOption = filterProducts ? '&orderBy="creatorId"&equalTo="$userId"': '';
     try {
-      final url = Uri.parse(
-          "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products.json");
+      final url = Uri.parse(apiBaseUrl + "products.json?auth=$authToken" + filterOption);
+      print("Le token est " + authToken!);
+      print("Le token est " + apiBaseUrl + "products.json?auth=$authToken");
 
       final response = await http.get(url);
-      final dynamic extractedData = json.decode(response.body) as Map<String, dynamic>;
-       if(extractedData == null){
+      final dynamic extractedData =
+          json.decode(response.body) as Map<String, dynamic>;
+      if (extractedData == null) {
         return;
       }
+      if (extractedData["error"] != null) {
+        throw HttpException(message: extractedData["error"]);
+      }
+      print(extractedData);
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(
           Product(
             id: prodId,
-            title: prodData['title'],
             description: prodData['description'],
+            title: prodData['title'],
             price: prodData['price'],
             imageUrl: prodData['imageUrl'],
             isFavorite: prodData['isFavorite'],
           ),
         );
       });
+      print(loadedProducts);
       _loadedList = loadedProducts;
       notifyListeners();
     } catch (error) {
@@ -82,8 +101,7 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
-    final url = Uri.parse(
-        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products.json");
+    final url = Uri.parse(apiBaseUrl + "products.json?auth=$authToken");
 
     try {
       final response = await http.post(url,
@@ -92,6 +110,8 @@ class ProductsProvider with ChangeNotifier {
             'description': product.description,
             'imageUrl': product.imageUrl,
             'price': product.price,
+            'creatorId': userId,
+            'isFavorite' : product.isFavorite
           }));
 
       final id = json.decode(response.body)['name'];
@@ -111,8 +131,7 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> updateProduct(Product newProduct, String id) async {
-    final url = Uri.parse(
-        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json");
+    final url = Uri.parse(apiBaseUrl + "products/$id.json?auth=$authToken");
 
     final productIndex = _loadedList.indexWhere((element) => element.id == id);
     if (productIndex >= 0) {
@@ -130,8 +149,7 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = Uri.parse(
-        "https://shoppy-59758-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json");
+    final url = Uri.parse(apiBaseUrl + "products/$id.json?auth=$authToken");
 
     final existingProductId =
         _loadedList.indexWhere((element) => element.id == id);

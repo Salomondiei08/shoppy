@@ -17,23 +17,15 @@ class ProductOverviewScreen extends StatefulWidget {
 }
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
-
   bool _showFavorite = false;
-  bool _isDataLoading = false;
 
-  Future<void> getOlineData() async {
-    setState(() {
-      _isDataLoading = true;
-    });
-await  Provider.of<ProductsProvider>(context, listen: false).fetchAndSetProducts();
-    setState(() {
-      _isDataLoading = false;
-    });
+  Future<void> getOlineData(BuildContext context) async {
+    await Provider.of<ProductsProvider>(context, listen: false)
+        .fetchAndSetProducts();
   }
 
   @override
   void initState() {
-    getOlineData();
     super.initState();
   }
 
@@ -84,38 +76,42 @@ await  Provider.of<ProductsProvider>(context, listen: false).fetchAndSetProducts
           )
         ],
       ),
-      body: _isDataLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : RefreshIndicator(
-            onRefresh: getOlineData,
-            child: Consumer<ProductsProvider>(
-                builder: (context, product, child) {
-                  return Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: GridView.builder(
-                      itemBuilder: (context, index) {
-                        return ProductGrid(
-                          id: _showFavorite
-                              ? product.favoriteProduct[index].id
-                              : product.allProduct[index].id,
+      body: FutureBuilder(
+        future: getOlineData(context),
+        builder: (ctx, snapShot) =>
+            snapShot.connectionState == ConnectionState.waiting
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () => getOlineData(context),
+                    child: Consumer<ProductsProvider>(
+                      builder: (context, product, child) {
+                        return Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: GridView.builder(
+                            itemBuilder: (context, index) {
+                              return ProductGrid(
+                                id: _showFavorite
+                                    ? product.favoriteProduct[index].id
+                                    : product.allProducts[index].id,
+                              );
+                            },
+                            itemCount: _showFavorite
+                                ? product.productFavoriteNumber
+                                : product.productNumber,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                          ),
                         );
                       },
-                      itemCount: _showFavorite
-                          ? product.productFavoriteNumber
-                          : product.productNumber,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                      ),
                     ),
-                  );
-                },
-              ),
-          ),
+                  ),
+      ),
     );
   }
 }

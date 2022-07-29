@@ -4,11 +4,13 @@ import 'package:shoppy/screens/order_screen.dart';
 import 'package:shoppy/screens/product_detail_screen.dart';
 import 'package:shoppy/screens/product_overview_screen.dart';
 import 'package:shoppy/screens/user_products_screen.dart';
+import 'package:shoppy/screens/auth_screen.dart';
 
 import '../screens/edit_products_screen.dart';
 
 abstract class Routes {
-  static const String productOverviewScreen = '/';
+  static const String productOverviewScreen = '/productOverviewScreen';
+  static const String authScreen = '/authscreen';
   static const String productDetailScreen = '/ProductDetailScreen';
   static const String cartScreen = '/CartScreen';
   static const String userProductsScreen = '/UserProductsScreen';
@@ -17,6 +19,7 @@ abstract class Routes {
 
   static Map<String, Widget Function(BuildContext)> routesList = {
     productOverviewScreen: (context) => const ProductOverviewScreen(),
+    authScreen: (context) =>  const AuthScreen(),
     productDetailScreen: (context) => const ProductDetailScreen(),
     cartScreen: (context) => const CartScreen(),
     userProductsScreen: (context) => const UserProductsScreen(),
